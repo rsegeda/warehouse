@@ -1,0 +1,28 @@
+# spring-boot-docker/docker-compose.yml
+version: "3.8"
+services:
+  db-mysql:
+    image: mysql:5.7
+    env_file: .env
+    networks:
+      - warehouse-api-network
+    ports:
+      - "3306:3306"
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=root_pwd
+      - MYSQL_DATABASE=warehouse
+  api:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    env_file: .env
+    ports:
+      - "9000:9000"
+    networks:
+      - warehouse-api-network
+    depends_on:
+      - db-mysql
+networks:
+  warehouse-api-network:
+    driver: bridge

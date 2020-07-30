@@ -7,6 +7,7 @@ package com.rsegeda.warehouse.rest.api.metrics;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.rsegeda.warehouse.domain.MetricDimension;
+import com.rsegeda.warehouse.domain.MetricDimensionFilter;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,6 +22,7 @@ import lombok.NoArgsConstructor;
 public class MetricsGenericQueryPostDto {
 
   private List<MetricDimension> aggregators;
+  private List<MetricDimensionFilter> filters;
   private Integer page;
   private Integer pageSize;
 }

@@ -67,7 +67,8 @@ public class MetricService {
 
   public MetricPageDto genericQuery(MetricsGenericQueryPostDto postDto) {
     Pageable userRequestedPage = PageRequest.of(postDto.getPage(), postDto.getPageSize());
-    return getMetricPageDto(genericMetricRepository.genericQuery(postDto.getAggregators(), userRequestedPage));
+    return getMetricPageDto(genericMetricRepository.genericQuery(postDto.getAggregators(), postDto.getFilters(),
+                                                                 userRequestedPage));
   }
 
   private MetricPageDto getMetricPageDto(Page<Metric> page) {

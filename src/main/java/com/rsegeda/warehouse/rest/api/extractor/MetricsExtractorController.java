@@ -5,19 +5,21 @@
 package com.rsegeda.warehouse.rest.api.extractor;
 
 
-import com.rsegeda.warehouse.domain.MetricService;
 import com.rsegeda.warehouse.rest.api.GenericApiResponseDto;
 import com.rsegeda.warehouse.rest.api.exception.MetricsExtractorException;
+import com.rsegeda.warehouse.service.MetricService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/metrics")
+@RequestMapping("/extractor")
 public class MetricsExtractorController {
 
   private final MetricExtractorService metricExtractorService;
@@ -44,8 +46,10 @@ public class MetricsExtractorController {
    * @throws MetricsExtractorException when something fails
    */
   @DeleteMapping("/tabularasa")
-  public GenericApiResponseDto clearAll() throws MetricsExtractorException {
-    metricService.removeAll();
+  public GenericApiResponseDto clearAll(
+    @RequestParam
+      String token) throws MetricsExtractorException {
+    metricService.removeAll(token);
     return GenericApiResponseDto.builder().build();
   }
 }

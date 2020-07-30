@@ -10,7 +10,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.rsegeda.warehouse.domain.Metric;
-import com.rsegeda.warehouse.domain.MetricService;
+import com.rsegeda.warehouse.service.MetricService;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;

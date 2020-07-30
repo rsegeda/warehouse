@@ -8,7 +8,7 @@ package com.rsegeda.warehouse.rest.api.extractor;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
 import com.rsegeda.warehouse.domain.Metric;
-import com.rsegeda.warehouse.domain.MetricService;
+import com.rsegeda.warehouse.service.MetricService;
 import com.rsegeda.warehouse.rest.api.exception.MetricsExtractorException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -54,5 +54,4 @@ public class MetricExtractorService {
       throw new MetricsExtractorException("Extracting metrics from URL failed. " + url, e);
     }
   }
-
 }

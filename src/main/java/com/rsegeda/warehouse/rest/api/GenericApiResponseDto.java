@@ -7,6 +7,8 @@ package com.rsegeda.warehouse.rest.api;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -20,9 +22,10 @@ import lombok.NoArgsConstructor;
 @JsonInclude(Include.NON_EMPTY)
 @NoArgsConstructor
 @AllArgsConstructor
-public class GenericApiResponseDto {
+public class GenericApiResponseDto{
 
-  @Default private boolean result = true;
+  @Default private boolean successful = true;
+  private Object result;
   @Default private List<String> details = new ArrayList<>();
 
   public void addMessage(String msg) {

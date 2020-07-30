@@ -15,6 +15,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
@@ -47,9 +49,9 @@ public class Metric {
   private String campaign;
 
   @CsvBindByName(column = "Daily")
-  @CsvDate("MM/dd/yyyy")
+  @CsvDate(value = "MM/dd/yy")
+  @Temporal(TemporalType.DATE)
   @NotNull
-  @Column
   private Date daily;
 
   @PositiveOrZero
@@ -61,4 +63,5 @@ public class Metric {
   @CsvBindByName(column = "Impressions")
   @Column
   private BigDecimal impressions;
+
 }

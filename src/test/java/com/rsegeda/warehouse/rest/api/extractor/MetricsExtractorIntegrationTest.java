@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.rsegeda.warehouse.domain.MetricService;
+import com.rsegeda.warehouse.service.MetricService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -51,8 +51,8 @@ public class MetricsExtractorIntegrationTest {
   public void startsDataExtractionInTheBackground() throws Exception {
     doNothing().when(metricExtractorServiceMock).populateDb(CORRECT_URL);
     mockMvc
-      .perform(get("/metrics/extract?url=" + CORRECT_URL))
+      .perform(get("/extractor/extract?url=" + CORRECT_URL))
       .andExpect(status().isOk())
-      .andExpect(jsonPath("$.result").value(true));
+      .andExpect(jsonPath("$.successful").value(true));
   }
 }

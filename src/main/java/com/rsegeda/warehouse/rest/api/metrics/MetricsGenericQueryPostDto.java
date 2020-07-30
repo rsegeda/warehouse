@@ -23,6 +23,7 @@ public class MetricsGenericQueryPostDto {
 
   private List<MetricDimension> aggregators;
   private List<MetricDimensionFilter> filters;
+  private List<MetricDimension> groupAggregators;
   private Integer page;
   private Integer pageSize;
 }

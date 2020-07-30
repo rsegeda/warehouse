@@ -29,8 +29,11 @@ public class GenericMetricRepositoryImpl implements GenericMetricRepository {
   @Transactional
   @Override
   public Page<Metric> genericQuery(
-    List<MetricDimension> aggregators, List<MetricDimensionFilter> filters, Pageable pageable) {
-    String query = buildMultiSelectQuery(aggregators, filters);
+    List<MetricDimension> aggregators,
+    List<MetricDimensionFilter> filters,
+    List<MetricDimension> groupAggregators,
+    Pageable pageable) {
+    String query = buildMultiSelectQuery(aggregators, filters, groupAggregators);
 
     @SuppressWarnings("unchecked")
     List<Metric> result = (List<Metric>) entityManager
@@ -39,12 +42,13 @@ public class GenericMetricRepositoryImpl implements GenericMetricRepository {
                                            .setFirstResult((int) pageable.getOffset())
                                            .getResultList();
 
-    Query queryTotal = entityManager.createQuery("SELECT COUNT(m.id) FROM Metric m");
+    Query queryTotal = entityManager.createQuery(String.format("SELECT COUNT(*) FROM (%s)", query));
     long total = (long) queryTotal.getSingleResult();
     return new PageImpl<>(result, PageRequest.of(pageable.getPageNumber() + 1, pageable.getPageSize()), total);
   }
 
-  private String buildMultiSelectQuery(List<MetricDimension> aggregators, List<MetricDimensionFilter> filters) {
+  private String buildMultiSelectQuery(
+    List<MetricDimension> aggregators, List<MetricDimensionFilter> filters, List<MetricDimension> groupAggregators) {
     String keyword = "SELECT ";
     String multiSelectFieldParts = keyword.concat(
       "m.".concat(String.join(", m.", aggregators.stream().map(MetricDimension::getDimension).toArray(String[]::new))));
@@ -58,7 +62,10 @@ public class GenericMetricRepositoryImpl implements GenericMetricRepository {
     String conditions =
       String.join(" AND ", filters.stream().map(this::buildConditionsForDimension).toArray(String[]::new));
 
-    return withWhere.concat(conditions);
+    String groupBy = " ORDER BY ".concat(
+      String.join(",", groupAggregators.stream().map(MetricDimension::getDimension).toArray(String[]::new)));
+
+    return withWhere.concat(conditions).concat(groupBy);
   }
 
   private String buildConditionsForDimension(MetricDimensionFilter metricDimensionFilter) {

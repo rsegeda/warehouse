@@ -17,6 +17,9 @@ import org.springframework.stereotype.Repository;
 public interface GenericMetricRepository {
 
   Page<Metric> genericQuery(
-    List<MetricDimension> aggregators, List<MetricDimensionFilter> filters, Pageable pageable);
+    List<MetricDimension> aggregators,
+    List<MetricDimensionFilter> filters,
+    List<MetricDimension> groupAggregators,
+    Pageable pageable);
 
 }

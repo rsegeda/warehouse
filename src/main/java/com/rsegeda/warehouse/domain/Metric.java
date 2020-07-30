@@ -64,4 +64,10 @@ public class Metric {
   @Column
   private BigDecimal impressions;
 
+  private void setDataSource(String dataSource) {
+    this.dataSource = dataSource.trim();
+  }
+  private void setCampaign(String campaign) {
+    this.campaign = campaign.trim();
+  }
 }

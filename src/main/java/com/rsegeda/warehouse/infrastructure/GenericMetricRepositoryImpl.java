@@ -14,6 +14,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -42,27 +43,25 @@ public class GenericMetricRepositoryImpl implements GenericMetricRepository {
                                            .setFirstResult((int) pageable.getOffset())
                                            .getResultList();
 
-    Query queryTotal = entityManager.createQuery(String.format("SELECT COUNT(*) FROM (%s)", query));
-    long total = (long) queryTotal.getSingleResult();
+    Query queryTotal = entityManager.createQuery(query.replace("SELECT", "SELECT COUNT(m),").concat(" GROUP BY m.id"));
+    long total = queryTotal.getResultList().size();
     return new PageImpl<>(result, PageRequest.of(pageable.getPageNumber() + 1, pageable.getPageSize()), total);
   }
 
   private String buildMultiSelectQuery(
     List<MetricDimension> aggregators, List<MetricDimensionFilter> filters, List<MetricDimension> groupAggregators) {
     String keyword = "SELECT ";
-    String multiSelectFieldParts = keyword.concat(
+    String multiSelectFieldParts = aggregators == null ? "*" : keyword.concat(
       "m.".concat(String.join(", m.", aggregators.stream().map(MetricDimension::getDimension).toArray(String[]::new))));
 
-    if (filters == null || filters.isEmpty()) {
-      return multiSelectFieldParts.concat(" FROM Metric m");
-    }
+    String withWhere = filters == null ? "" : multiSelectFieldParts.concat(" FROM Metric m WHERE ");
 
-    String withWhere = multiSelectFieldParts.concat(" FROM Metric m WHERE ");
+    String conditions = filters == null ? "" : String.join(" AND ", filters
+                                                                      .stream()
+                                                                      .map(this::buildConditionsForDimension)
+                                                                      .toArray(String[]::new));
 
-    String conditions =
-      String.join(" AND ", filters.stream().map(this::buildConditionsForDimension).toArray(String[]::new));
-
-    String groupBy = " ORDER BY ".concat(
+    String groupBy = groupAggregators == null ? "" : " ORDER BY ".concat(
       String.join(",", groupAggregators.stream().map(MetricDimension::getDimension).toArray(String[]::new)));
 
     return withWhere.concat(conditions).concat(groupBy);
@@ -83,13 +82,18 @@ public class GenericMetricRepositoryImpl implements GenericMetricRepository {
                          .getDimensionName()
                          .concat(" ")
                          .concat(filterCondition.getOperation())
-                         .concat(String
-                                   .valueOf(filterCondition.getFirstValue())
+                         .concat("'"
+                                   .concat(escapeSqlChars(String.valueOf(filterCondition.getFirstValue())))
+                                   .concat("'")
                                    .concat(buildSecondValueIfExist(filterCondition))));
   }
 
+  private String escapeSqlChars(String val) {
+    return StringUtils.replace(val, "'", "''");
+  }
+
   private String buildSecondValueIfExist(FilterCondition filterCondition) {
-    return filterCondition.getSecondValue() == null ? ""
-                                                    : " AND ".concat(String.valueOf(filterCondition.getSecondValue()));
+    return filterCondition.getSecondValue() == null ? "" : " AND ".concat(
+      escapeSqlChars(String.valueOf(filterCondition.getSecondValue())));
   }
 }

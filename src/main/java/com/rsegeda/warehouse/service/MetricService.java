@@ -11,9 +11,11 @@ import com.rsegeda.warehouse.infrastructure.GenericMetricRepository;
 import com.rsegeda.warehouse.rest.api.metrics.MetricsGenericQueryPostDto;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -65,11 +67,11 @@ public class MetricService {
     });
   }
 
+  @Cacheable
   public MetricPageDto genericQuery(MetricsGenericQueryPostDto postDto) {
     Pageable userRequestedPage = PageRequest.of(postDto.getPage(), postDto.getPageSize());
     return getMetricPageDto(genericMetricRepository.genericQuery(postDto.getAggregators(), postDto.getFilters(),
-                                                                 postDto.getGroupAggregators(),
-                                                                 userRequestedPage));
+                                                                 postDto.getGroupAggregators(), userRequestedPage));
   }
 
   private MetricPageDto getMetricPageDto(Page<Metric> page) {
